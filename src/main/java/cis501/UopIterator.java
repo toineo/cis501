@@ -38,7 +38,7 @@ public class UopIterator implements Iterator<Uop>, Iterable<Uop> {
 
     public boolean hasNext() {
         try {
-            return uopsProcessed <= LIMIT && reader.ready();
+            return uopsProcessed < LIMIT && reader.ready();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
