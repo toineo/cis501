@@ -55,7 +55,7 @@ public class InorderPipelineSampleTest {
         sim.run(uops);
         assertEquals(1, sim.getInsns());
         // 123456789abcdef
-        // fdxmmmmw|
+        // fdxmw|
         assertEquals(6, sim.getCycles());
     }
 
@@ -69,9 +69,9 @@ public class InorderPipelineSampleTest {
         sim.run(uops);
         assertEquals(COUNT, sim.getInsns());
         // 123456789abcdefghi
-        // fdxmmmmw        |
-        //  fdx   mmmmw    |
-        //   fd   x   mmmmw|
+        // fdxmw  |
+        //  fdxmw |
+        //   fdxmw|
         assertEquals(5 + COUNT, sim.getCycles());
     }
 
@@ -83,8 +83,8 @@ public class InorderPipelineSampleTest {
         sim.run(uops);
         assertEquals(2, sim.getInsns());
         // 123456789abcdef
-        // fdxmmmmw  |
-        //  fd    xmw|
+        // fdxmw  |
+        //  fd xmw|
         assertEquals(6 + 2, sim.getCycles());
     }
 
