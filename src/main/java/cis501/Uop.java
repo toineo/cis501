@@ -5,12 +5,6 @@ import java.util.StringTokenizer;
 /** Class representing a single micro-op. */
 public class Uop {
 
-    public enum Flags {ReadFlags, WriteFlags, IgnoreFlags}
-
-    public enum BranchOp {Taken, NotTaken, NotABranch}
-
-    public enum MemoryOp {Load, Store, NotAMemOp}
-
     /** Index of the uop within the macro-op */
     public final int uopId;
 
@@ -24,7 +18,7 @@ public class Uop {
     public final MemoryOp mem;
 
     public final long instructionAddress;
-    public final BranchOp branch;
+    public final Direction branch;
     public final long fallthroughPC;
     public final long targetAddressTakenBranch;
 
@@ -49,14 +43,14 @@ public class Uop {
         }
     }
 
-    protected BranchOp BranchOfChar(char c) {
+    protected Direction BranchOfChar(char c) {
         switch (c) {
             case 'T':
-                return BranchOp.Taken;
+                return Direction.Taken;
             case 'N':
-                return BranchOp.NotTaken;
+                return Direction.NotTaken;
             case '-':
-                return BranchOp.NotABranch;
+                return null;
             default:
                 throw new IllegalArgumentException("Invalid branch type: " + c);
         }
@@ -69,12 +63,13 @@ public class Uop {
             case 'S':
                 return MemoryOp.Store;
             case '-':
-                return MemoryOp.NotAMemOp;
+                return null;
             default:
                 throw new IllegalArgumentException("Invalid mem op: " + c);
         }
     }
 
+    /** Parse a uop from a line in the trace file */
     public Uop(String line) {
         StringTokenizer st = new StringTokenizer(line);
         assert 14 == st.countTokens();
@@ -95,23 +90,24 @@ public class Uop {
         this.microOperation = st.nextToken();
     }
 
-    /** Special constructor used for testing the pipeline simulator */
-    public Uop(int sr1, int sr2, int dr, MemoryOp mop) {
+    /** Create a uop manually. Used for testing. */
+    public Uop(int sr1, int sr2, int dr, MemoryOp mop, int uid, long pc,
+               Flags f, Direction dir, long immed, long dataAddr,
+               long fallthruPC, long targetPC, String macro, String micro) {
         this.srcReg1 = (short) sr1;
         this.srcReg2 = (short) sr2;
         this.dstReg = (short) dr;
         this.mem = mop;
-
-        this.uopId = -1;
-        this.instructionAddress = 0;
-        this.flags = Flags.IgnoreFlags;
-        this.branch = BranchOp.NotABranch;
-        this.immediate = 0;
-        this.dataAddress = 0;
-        this.fallthroughPC = 0;
-        this.targetAddressTakenBranch = 0;
-        this.macroOperation = "mock uop";
-        this.microOperation = "mock uop";
+        this.uopId = uid;
+        this.instructionAddress = pc;
+        this.flags = f;
+        this.branch = dir;
+        this.immediate = immed;
+        this.dataAddress = dataAddr;
+        this.fallthroughPC = fallthruPC;
+        this.targetAddressTakenBranch = targetPC;
+        this.macroOperation = macro;
+        this.microOperation = micro;
     }
 
 }

@@ -17,9 +17,9 @@ public class TraceAnalyzerSampleTest {
     public static void setUpClass() throws Exception {
         // Run the trace before any tests are run. Then, test the results of the run.
 
-        // TODO: replace name of trace file in the cis501.properties file, then uncomment this
-        //UopIterator uiter = new UopIterator(MyProperties.traceFile(), MyProperties.uopLimit(), new UopFactory());
-        //subm.run(uiter);
+        // TODO: replace the name of trace file here
+        UopIterator uiter = new UopIterator("path/to/trace-file", -1, new UopFactory());
+        subm.run(uiter);
     }
 
     /** Simple do-nothing test to verify that the test suite is being run. */
@@ -28,12 +28,11 @@ public class TraceAnalyzerSampleTest {
         assertTrue(true);
     }
 
-    /* the trace's actual average insn size. Uncomment to check your implementation.
+    /** The trace's actual average insn size, so you can check your implementation. */
     @Test
     public void testAvgInsnSize() {
         assertEquals(4.72, subm.avgInsnSize(), 0.01);
     }
-    */
 
     // add more tests here!
 
