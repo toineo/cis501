@@ -1,9 +1,9 @@
 package cis501.submission;
 
 import cis501.ITraceAnalyzer;
+import cis501.MemoryOp;
 import cis501.Uop;
-import cis501.Uop.Flags;
-import cis501.Uop.MemoryOp;
+import cis501.Flags;
 
 public class TraceAnalyzer<T extends Uop> implements ITraceAnalyzer<T> {
 	private int [] uopCatCount;
