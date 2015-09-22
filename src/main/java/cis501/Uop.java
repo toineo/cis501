@@ -75,6 +75,7 @@ public class Uop {
         assert 14 == st.countTokens();
 
         this.uopId = Integer.parseInt(st.nextToken());
+        assert this.uopId >= 1;
         this.instructionAddress = Long.parseLong(st.nextToken(), 16);
         this.srcReg1 = Short.parseShort(st.nextToken());
         this.srcReg2 = Short.parseShort(st.nextToken());
@@ -99,6 +100,7 @@ public class Uop {
         this.dstReg = (short) dr;
         this.mem = mop;
         this.uopId = uid;
+        assert this.uopId >= 1;
         this.instructionAddress = pc;
         this.flags = f;
         this.branch = dir;
