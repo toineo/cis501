@@ -1,6 +1,7 @@
 package cis501.submission;
 
 
+import cis501.BranchPredictor;
 import cis501.IInorderPipeline;
 import cis501.Uop;
 
@@ -34,6 +35,10 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
      */
     public InorderPipeline(int additionalMemLatency) {
 
+    }
+
+    /** ctor for HW4: Branch Prediction */
+    public InorderPipeline(int additionalMemLatency, BranchPredictor bp) {
     }
 
     @Override
