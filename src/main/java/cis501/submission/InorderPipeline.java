@@ -198,6 +198,10 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
     
 	// Get the (potential) stall of <uop> at <stage>
     private Stall getStallAtStage(Uop uop, Stage stage) {
+    	// Nops never stall
+    	if (uop == null)
+    		return null;
+    	
 		// Currently only one case: memory operation
     	// The test on addMemLatency just ensures we don't add stalls with no cycles
     	if (stage == Stage.Memory && uop.mem != null && addMemLatency > 0)
