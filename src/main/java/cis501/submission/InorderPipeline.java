@@ -3,6 +3,7 @@ package cis501.submission;
 import java.util.EnumMap;
 
 import cis501.IInorderPipeline;
+import cis501.MemoryOp;
 import cis501.Uop;
 import cis501.submission.Stall;
 
@@ -74,20 +75,105 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
     		pipeline.put(s, null);
     	
         for (Uop uop : ui) {
+        	// Invariant: the fetch stage must have no uop stored in it
+        	// To maintain this invariant, we performed as many cycles
+        	// as needed to free this stage
+        	// In the case where there is no stall, this is of course
+        	// exactly 1 cycle
+        	pipeline.put(Stage.Fetch, uop);
         	
-        	// TODO
+        	// Different cases in which the added uop must be delayed
+        	// (currently, only the load-use case)
+        	Uop decUop = pipeline.get(Stage.Decode);
+        	if (decUop != null && decUop.mem == MemoryOp.Load &&
+        			(
+        					(uop.srcReg1 == decUop.dstReg) 
+        				|| 
+        					(uop.srcReg2 == decUop.dstReg && uop.mem != MemoryOp.Store)
+        			)
+        		)
+        		pipelineStalls.put(Stage.Fetch, new Stall(StallCause.Hazard, 1));
+        	else
+        		pipelineStalls.put(Stage.Fetch, null); // No stall
         	
-        	// TODO: cycleUntil method
+        	cycleUntilFreeFetch ();
         }
+        
+        // Perform the last operations (flush the pipeline)
+        while (pipelineContainsUops())
+        	cycleUntilFreeFetch();
 
     }
     
     
-    // Get uop in previous stage, or nop if stage = fetch
-    private Uop getPreviousStageUop(EnumMap<Stage, Uop> pipeline, Stage stage) {
+    // Cycle until the fetch stage gets freed
+    // That is, until every uop in the pipeline make at least one step forward
+    // (some may do more than one)
+    private void cycleUntilFreeFetch() {
+    	boolean moving; // FIXME name
+    	
+		do {
+			moving = true;
+			cycles++;
+			
+			for (Stage st : reverseStageOrder) {
+				Stall stall = pipelineStalls.get(st);
+				
+				if (moving) {	
+					// Stalled uop case
+					if (stall != null && stall.ncycles > 0) {
+						stall.ncycles--;
+						moving = false;
+					}
+					// No stall, let's just proceed
+					else
+						stepUopAtStage(st);
+				}
+				
+				else {
+					// Not moving, so just update uops that are going through
+					// stages with latency (in case there's more than one such
+					// stage)
+					if (stall != null && stall.cause == StallCause.StageLatency && stall.ncycles > 0)
+						stall.ncycles--;					
+				}
+			}
+		} while (!moving);
+		// The condition ensures that even the uop in the fetch stage has moved
+	}
+
+    private void stepUopAtStage(Stage curStage) {
+    	Stage nextStage = getNextStage (curStage);
+    	Uop curUop = pipeline.get(curStage);
+    	
+    	if (nextStage != null) {
+    		pipeline.put(nextStage, curUop);
+    		pipelineStalls.put(nextStage, getStallAtStage(curUop, nextStage));
+    	}
+
+    	// FIXME: we don't need to do it for every stage
+		pipeline.put(curStage, nop);
+    }
+    
+    private Stage getNextStage(Stage stage) {
     	switch (stage) {
-    	case Fetch: 
-    		return nop;
+		case Fetch:
+			return Stage.Decode;
+		case Decode:
+			return Stage.Execute;
+		case Execute:
+			return Stage.Memory;
+		case Memory:
+			return Stage.Writeback;
+		default:
+			return null;
+		}
+    }
+    
+    // FIXME: remove, useless
+	// Get uop in previous stage, or nop if stage = fetch
+    private Uop getPreviousStageUop(Stage stage) {
+    	switch (stage) {
     	case Decode:
     		return pipeline.get(Stage.Fetch);
     	case Execute:
@@ -96,9 +182,28 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
     		return pipeline.get(Stage.Execute);
     	case Writeback:
     		return pipeline.get(Stage.Memory);
+    	case Fetch: 
     	default:
-    		return nop; // Just to kill compiler warnings
+    		return nop; 
     	}
+    }
+    
+    private boolean pipelineContainsUops() {
+    	for (Stage st : reverseStageOrder)
+    		if (pipeline.get(st) != nop)
+    			return true;
+    	
+    	return false;
+    }
+    
+	// Get the (potential) stall of <uop> at <stage>
+    private Stall getStallAtStage(Uop uop, Stage stage) {
+		// Currently only one case: memory operation
+    	// The test on addMemLatency just ensures we don't add stalls with no cycles
+    	if (stage == Stage.Memory && uop.mem != null && addMemLatency > 0)
+    		return new Stall(StallCause.StageLatency, addMemLatency);
+    		    	
+    	return null; // No stall otherwise
     }
 
     @Override

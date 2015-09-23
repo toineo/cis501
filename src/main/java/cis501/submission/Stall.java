@@ -14,7 +14,7 @@ enum StallCause {
 // This is of course only meant for the fetch stage
 public final class Stall {
 	public final StallCause cause;
-	public final int ncycles;
+	public int ncycles;
 	
 	public Stall(StallCause cause, int ncycles) {
 		this.cause = cause;
