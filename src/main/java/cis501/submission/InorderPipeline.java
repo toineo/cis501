@@ -87,7 +87,11 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
         	// exactly 1 cycle
         	pipeline.put(Stage.Fetch, uop);
         	
-        	
+        	// FIXME: According to the course slides, the load-use case is
+            // detected at the decode stage (and not at fetch). For the
+            // current homework, it is still correct to do it at fetch, but
+            // this should be fixed later.
+
         	// Different cases in which the added uop must be delayed
         	// (currently, only the load-use case)
         	Uop decUop = pipeline.get(Stage.Decode);
