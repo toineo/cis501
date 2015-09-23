@@ -40,6 +40,7 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
 	private EnumMap<Stage, Stall> pipelineStalls;
 	
 	private int cycles = 0;
+	private int insns = 0;
 	
 	private final int addMemLatency;
 
@@ -75,12 +76,17 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
     		pipeline.put(s, null);
     	
         for (Uop uop : ui) {
+        	// Count insns
+        	if (uop.uopId == 1)
+        		insns++;
+        	
         	// Invariant: the fetch stage must have no uop stored in it
         	// To maintain this invariant, we performed as many cycles
         	// as needed to free this stage
         	// In the case where there is no stall, this is of course
         	// exactly 1 cycle
         	pipeline.put(Stage.Fetch, uop);
+        	
         	
         	// Different cases in which the added uop must be delayed
         	// (currently, only the load-use case)
@@ -98,6 +104,9 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
         	
         	cycleUntilFreeFetch ();
         }
+        
+        // FIXME: more elegant solution
+        cycles++; // Otherwise we omit the very first cycle
         
         // Perform the last operations (flush the pipeline)
         while (pipelineContainsUops())
@@ -212,11 +221,11 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
 
     @Override
     public long getInsns() {
-        return 0;
+        return insns;
     }
 
     @Override
     public long getCycles() {
-        return 0;
+        return cycles;
     }
 }
