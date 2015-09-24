@@ -55,8 +55,10 @@ public class BranchPredSampleTest {
     public void testBtbAlias() {
         btb.train(0, 42);
         assertEquals(42, btb.predict(0));
-        btb.train((long) Math.pow(2, 3), 100);
-        assertEquals(100, btb.predict(0));
+        long alias0 = (long) Math.pow(2, 3);
+        btb.train(alias0, 100);
+        assertEquals(0, btb.predict(0)); // tag doesn't match
+        assertEquals(100, btb.predict(alias0)); // tag matches
     }
 
     // Bimodal tests
