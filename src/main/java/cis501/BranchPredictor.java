@@ -43,8 +43,10 @@ public class BranchPredictor {
      * @param actualDir    the actual direction of the branch
      */
     public void train(long pc, long actualNextPC, Direction actualDir) {
-        // only record taken branches in the BTB, performs better than always updating BTB with actualNextPC
-        btb.train(pc, (Direction.Taken == actualDir) ? actualNextPC : 0);
+        // only record taken branches in the BTB
+        if (Direction.Taken == actualDir) {
+            btb.train(pc, actualNextPC);
+        }
         dp.train(pc, actualDir);
     }
 
