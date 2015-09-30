@@ -66,7 +66,7 @@
 
   <target name="test" depends="compile">
     <mkdir dir="${testreport.dir}"/>
-    <junit printsummary="yes" haltonfailure="yes">
+    <junit printsummary="yes" haltonfailure="no">
       <classpath>
         <path refid="libClasspath"/>
         <path refid="appClasspath"/>
