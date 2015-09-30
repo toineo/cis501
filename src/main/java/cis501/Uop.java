@@ -112,4 +112,13 @@ public class Uop {
         this.microOperation = micro;
     }
 
+    @Override
+    public String toString() {
+        return String.format("src1:%d src2:%d dst:%d %s uopid:%d pc:%x targ:%x fallthru:%x flags:%s branch:%s immed:%d addr:%x %s %s",
+                srcReg1, srcReg2, dstReg, mem, uopId,
+                instructionAddress, targetAddressTakenBranch, fallthroughPC,
+                flags, branch, immediate, dataAddress,
+                microOperation, macroOperation);
+    }
+
 }
