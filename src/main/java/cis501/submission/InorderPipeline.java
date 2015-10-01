@@ -2,6 +2,8 @@ package cis501.submission;
 
 import java.util.EnumMap;
 
+import cis501.BranchPredictor;
+import cis501.ICache;
 import cis501.IInorderPipeline;
 import cis501.MemoryOp;
 import cis501.Uop;
@@ -63,7 +65,14 @@ public class InorderPipeline<T extends Uop> implements IInorderPipeline<T> {
     	pipelineStalls = new EnumMap<Stage, Stall>(Stage.class);
     }
 
-    
+    /** ctor for HW4: Branch Prediction */
+    public InorderPipeline(int additionalMemLatency, BranchPredictor bp) {
+    }
+
+    /** ctor for HW5: Caches */
+    public InorderPipeline(BranchPredictor bp, ICache ic, ICache dc) {
+    }
+
     @Override
     public void run(Iterable<T> ui) {
     	
